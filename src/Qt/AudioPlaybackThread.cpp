@@ -81,12 +81,16 @@ namespace openshot
 			// Populate all possible device types and device names (starting with the user's requested settings)
 			std::vector<openshot::AudioDeviceInfo> devices{ { requested_device } };
 			for (const auto t : mgr->getAvailableDeviceTypes()) {
+				std::stringstream type_debug;
+				type_debug << "AudioDeviceManagerSingleton::Instance (iterate audio device type: " <<  t->getTypeName() << ")";
+				ZmqLogger::Instance()->AppendDebugMethod(type_debug.str(), "rate", rate, "channels", channels);
+
 				t->scanForDevices();
 				for (const auto n : t->getDeviceNames()) {
 					AudioDeviceInfo device = { t->getTypeName(), n.trim() };
 					devices.push_back(device);
 					std::stringstream device_debug;
-					device_debug << "AudioDeviceManagerSingleton::Instance (iterate audio device name: " <<  device.name << ")";
+					device_debug << "AudioDeviceManagerSingleton::Instance (iterate audio device name: " <<  device.name << ", type: " <<  t->getTypeName() << ")";
 					ZmqLogger::Instance()->AppendDebugMethod(device_debug.str(), "rate", rate, "channels", channels);
 				}
 			}
