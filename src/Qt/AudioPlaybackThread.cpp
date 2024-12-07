@@ -85,6 +85,9 @@ namespace openshot
 				for (const auto n : t->getDeviceNames()) {
 					AudioDeviceInfo device = { t->getTypeName(), n.trim() };
 					devices.push_back(device);
+					std::stringstream device_debug;
+					device_debug << "AudioDeviceManagerSingleton::Instance (iterate audio device name: " <<  device.name << ")";
+					ZmqLogger::Instance()->AppendDebugMethod(device_debug.str(), "rate", rate, "channels", channels);
 				}
 			}
 
