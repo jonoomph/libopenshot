@@ -49,10 +49,10 @@ namespace openshot
 
         // Start the threads
         if (reader->info.has_audio)
-            audioPlayback->startThread(8);
+            audioPlayback->startThread(Priority::highest);
         if (reader->info.has_video) {
-            videoCache->startThread(2);
-            videoPlayback->startThread(4);
+            videoCache->startThread(Priority::high);
+            videoPlayback->startThread(Priority::high);
         }
 
         using std::chrono::duration_cast;
@@ -179,7 +179,7 @@ namespace openshot
         if (video_position < 0) return false;
 
         stopPlayback();
-        startThread(1);
+        startThread(Priority::normal);
         return true;
     }
 
