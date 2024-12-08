@@ -49,7 +49,7 @@ namespace openshot
 
         // Start the threads
         if (reader->info.has_audio)
-            audioPlayback->startThread(Priority::highest);
+            audioPlayback->startThread(Priority::high);
         if (reader->info.has_video) {
             videoCache->startThread(Priority::high);
             videoPlayback->startThread(Priority::high);
@@ -179,7 +179,7 @@ namespace openshot
         if (video_position < 0) return false;
 
         stopPlayback();
-        startThread(Priority::normal);
+        startThread(Priority::high);
         return true;
     }
 

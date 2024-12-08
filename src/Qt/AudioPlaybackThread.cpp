@@ -267,7 +267,7 @@ namespace openshot
 				audioInstance->audioDeviceManager.addAudioCallback(&player);
 
 				// Create TimeSliceThread for audio buffering
-				time_thread.startThread();
+				time_thread.startThread(Priority::high);
 
 				// Connect source to transport
 				transport.setSource(
