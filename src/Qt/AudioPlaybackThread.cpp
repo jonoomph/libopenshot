@@ -113,6 +113,7 @@ namespace openshot
 				AudioDeviceManager::AudioDeviceSetup deviceSetup = AudioDeviceManager::AudioDeviceSetup();
 				deviceSetup.inputChannels = 0;
 				deviceSetup.outputChannels = channels;
+				deviceSetup.bufferSize = 512;
 
 				// Loop through common sample rates, starting with the user's requested rate
 				// Not all sample rates are supported by audio devices, for example, many VMs
