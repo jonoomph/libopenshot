@@ -59,9 +59,9 @@ namespace openshot
 
 			std::stringstream constructor_title;
 			constructor_title << "AudioDeviceManagerSingleton::Instance (default audio device type: " <<
-			Settings::Instance()->PLAYBACK_AUDIO_DEVICE_TYPE << ", default audio device name: " <<
-			Settings::Instance()->PLAYBACK_AUDIO_DEVICE_NAME << ")";
-			ZmqLogger::Instance()->AppendDebugMethod(constructor_title.str(), "channels", channels);
+				Settings::Instance()->PLAYBACK_AUDIO_DEVICE_TYPE << ", default audio device name: " <<
+				Settings::Instance()->PLAYBACK_AUDIO_DEVICE_NAME << ")";
+			ZmqLogger::Instance()->AppendDebugMethod(constructor_title.str(), "channels", channels, "buffer", Settings::Instance()->PLAYBACK_AUDIO_BUFFER_SIZE);
 
 			// Get preferred audio device type and name (if any - these can be blank)
 			openshot::AudioDeviceInfo requested_device = {Settings::Instance()->PLAYBACK_AUDIO_DEVICE_TYPE,
@@ -113,7 +113,7 @@ namespace openshot
 				AudioDeviceManager::AudioDeviceSetup deviceSetup = AudioDeviceManager::AudioDeviceSetup();
 				deviceSetup.inputChannels = 0;
 				deviceSetup.outputChannels = channels;
-				deviceSetup.bufferSize = 512;
+				deviceSetup.bufferSize = Settings::Instance()->PLAYBACK_AUDIO_BUFFER_SIZE;
 
 				// Loop through common sample rates, starting with the user's requested rate
 				// Not all sample rates are supported by audio devices, for example, many VMs

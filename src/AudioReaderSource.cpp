@@ -13,8 +13,6 @@
 #include "AudioReaderSource.h"
 #include "Exceptions.h"
 #include "Frame.h"
-#include "ZmqLogger.h"
-
 
 using namespace std;
 using namespace openshot;
@@ -44,8 +42,6 @@ void AudioReaderSource::getNextAudioBlock(const juce::AudioSourceChannelInfo& in
 		}
 
         while (remaining_samples > 0) {
-            ZmqLogger::Instance()->AppendDebugMethod("AudioReaderSource::getNextAudioBlock", "remaining_samples", remaining_samples);
-
             try {
                 // Get current frame object
                 if (reader) {
