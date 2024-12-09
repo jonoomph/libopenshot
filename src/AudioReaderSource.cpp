@@ -43,6 +43,7 @@ void AudioReaderSource::getNextAudioBlock(const juce::AudioSourceChannelInfo& in
 		}
 
         while (remaining_samples > 0) {
+            std::cout << "AudioReaderSource::getNextAudioBlock: #" << remaining_samples << std::endl;
 
             try {
                 // Get current frame object
