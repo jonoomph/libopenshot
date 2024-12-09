@@ -25,6 +25,8 @@
 #include <thread>	// for std::this_thread::sleep_for
 #include <chrono>	// for std::chrono::milliseconds
 #include <sstream>
+#include <condition_variable>
+#include <mutex>
 
 using namespace juce;
 
@@ -241,16 +243,21 @@ namespace openshot
 		}
 	}
 
-	// Play the audio
+	// Override Play and Stop to notify of state changes
 	void AudioPlaybackThread::Play() {
-		// Start playing
 		is_playing = true;
+		NotifyTransportStateChanged();
 	}
 
-	// Stop the audio
 	void AudioPlaybackThread::Stop() {
-		// Stop playing
 		is_playing = false;
+		NotifyTransportStateChanged();
+	}
+
+	void AudioPlaybackThread::NotifyTransportStateChanged()
+	{
+		std::lock_guard<std::mutex> lock(transportMutex);
+		transportCondition.notify_all();
 	}
 
 	// Start audio thread
@@ -286,8 +293,13 @@ namespace openshot
 				// Start the transport
 				transport.start();
 
-				while (!threadShouldExit() && transport.isPlaying() && is_playing)
-					std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                    while (!threadShouldExit() && transport.isPlaying() && is_playing) {
+                        // Wait until transport state changes or thread should exit
+                        std::unique_lock<std::mutex> lock(transportMutex);
+                        transportCondition.wait_for(lock, std::chrono::milliseconds(10), [this]() {
+                            return threadShouldExit() || !transport.isPlaying() || !is_playing;
+                        });
+                    }
 
 				// Stop audio and shutdown transport
 				Stop();
