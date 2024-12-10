@@ -289,7 +289,7 @@ namespace openshot {
 
 		/// Look up the position/start time of the first timeline element
 		double GetMinTime();
-		/// Look up the start frame number of the first element on the timeline
+		/// Look up the start frame number of the first element on the timeline (first frame is 1)
 		int64_t GetMinFrame();
 
 		/// Close the timeline reader (and any resources it was consuming)
