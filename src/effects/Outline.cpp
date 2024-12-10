@@ -63,7 +63,9 @@ std::shared_ptr<openshot::Frame> Outline::GetFrame(std::shared_ptr<openshot::Fra
 	std::vector<cv::Mat> channels(4);
     cv::split(cv_image, channels);
 	cv::Mat alpha_mask = channels[3].clone();
-	cv::threshold(alpha_mask, alpha_mask, 254, 255, cv::ThresholdTypes::THRESH_BINARY); // threshold the alpha channel to remove aliased edges
+	
+	// Disable de-antialiased
+	// cv::threshold(alpha_mask, alpha_mask, 254, 255, cv::ThresholdTypes::THRESH_BINARY); // threshold the alpha channel to remove aliased edges
 
 	
 	// Create the outline mask
