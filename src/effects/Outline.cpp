@@ -71,6 +71,19 @@ std::shared_ptr<openshot::Frame> Outline::GetFrame(std::shared_ptr<openshot::Fra
 	cv::GaussianBlur(alpha_mask, outline_mask, cv::Size(0, 0), sigmaValue, sigmaValue, cv::BorderTypes::BORDER_DEFAULT);
 	cv::threshold(outline_mask, outline_mask, 0, 255, cv::ThresholdTypes::THRESH_BINARY);
 
+	// Antialias the outline edge
+	// Apply Canny edge detection to the outline mask
+	cv::Mat edge_mask;
+	cv::Canny(outline_mask, edge_mask, 250, 255);
+
+	// Apply Gaussian blur only to the edge mask
+	cv::Mat blurred_edge_mask;
+	cv::GaussianBlur(edge_mask, blurred_edge_mask, cv::Size(0, 0), 0.8, 0.8, cv::BorderTypes::BORDER_DEFAULT);
+	
+	// Combine the blurred edge mask with the original alpha mask
+	cv::Mat combined_mask;
+	cv::bitwise_or(outline_mask, blurred_edge_mask, outline_mask);
+	cv::imwrite("outline_mask.png", outline_mask);
 	cv::Mat final_image;
 
 	// create solid color source mat
