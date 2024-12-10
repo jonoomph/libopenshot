@@ -83,7 +83,7 @@ std::shared_ptr<openshot::Frame> Outline::GetFrame(std::shared_ptr<openshot::Fra
 	// Combine the blurred edge mask with the original alpha mask
 	cv::Mat combined_mask;
 	cv::bitwise_or(outline_mask, blurred_edge_mask, outline_mask);
-	cv::imwrite("outline_mask.png", outline_mask);
+	
 	cv::Mat final_image;
 
 	// create solid color source mat
