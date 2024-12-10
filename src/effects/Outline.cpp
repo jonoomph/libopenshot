@@ -1,7 +1,7 @@
 /**
  * @file
  * @brief Source file for Outline effect class
- * @author Jonathan Thomas <jonathan@openshot.org>, Hai Vu <me@haivq.com>
+ * @author Jonathan Thomas <jonathan@openshot.org>, HaiVQ <me@haivq.com>
  *
  * @ref License
  */
@@ -9,7 +9,7 @@
 // Copyright (c) 2008-2019 OpenShot Studios, LLC
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
-#include <opencv2/imgcodecs.hpp> 
+
 #include "Outline.h"
 #include "Exceptions.h"
 
