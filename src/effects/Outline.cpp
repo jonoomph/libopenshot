@@ -56,8 +56,8 @@ std::shared_ptr<openshot::Frame> Outline::GetFrame(std::shared_ptr<openshot::Fra
 	int blueValue = blue.GetValue(frame_number);
 	int alphaValue = alpha.GetValue(frame_number);
 	
-	// Get ARGB image from QImage
-	cv::Mat cv_image = QImageToARGBCvMat(frame_image);
+	// Get BGRA image from QImage
+	cv::Mat cv_image = QImageToBGRACvMat(frame_image);
 
 	// extract alpha channel to create the alpha mask from the image
 	std::vector<cv::Mat> channels(4);
@@ -95,7 +95,7 @@ std::shared_ptr<openshot::Frame> Outline::GetFrame(std::shared_ptr<openshot::Fra
 	solid_color_mat.copyTo(final_image, outline_mask);
 	cv_image.copyTo(final_image, alpha_mask);
 	
-	std::shared_ptr<QImage> new_frame_image = ARGBCvMatToQImage(final_image);
+	std::shared_ptr<QImage> new_frame_image = BGRACvMatToQImage(final_image);
 
 	// FIXME: The shared_ptr::swap does not work somehow
 	// frame_image.swap(new_frame_image);
@@ -105,11 +105,11 @@ std::shared_ptr<openshot::Frame> Outline::GetFrame(std::shared_ptr<openshot::Fra
 	return frame;
 }
 
-cv::Mat Outline::QImageToARGBCvMat(std::shared_ptr<QImage>& qimage) {
+cv::Mat Outline::QImageToBGRACvMat(std::shared_ptr<QImage>& qimage) {
 	return cv::Mat(qimage->height(), qimage->width(), CV_8UC4, (uchar*)qimage->constBits(), qimage->bytesPerLine());
 }
 
-std::shared_ptr<QImage> Outline::ARGBCvMatToQImage(cv::Mat img) {
+std::shared_ptr<QImage> Outline::BGRACvMatToQImage(cv::Mat img) {
 	QImage qimage(img.data, img.cols, img.rows, img.step, QImage::Format_ARGB32);
 	std::shared_ptr<QImage> imgIn = std::make_shared<QImage>(qimage.convertToFormat(QImage::Format_RGBA8888_Premultiplied));
 	return imgIn;
