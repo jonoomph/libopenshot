@@ -55,7 +55,7 @@ namespace openshot
 		/// Blank constructor, useful when using Json to load the effect properties
 		Outline();
 
-		/// Default constructor, which require width
+		/// Default constructor, which require width, red, green, blue, alpha
 		///
 		/// @param width the width of the outline (between 0 and 1000, rounded to int)
 		/// @param red the red channel of the outline (between 0 and 255, rounded to int)
