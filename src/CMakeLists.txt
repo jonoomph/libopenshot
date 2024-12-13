@@ -176,7 +176,8 @@ target_include_directories(openshot
 # Find JUCE-based openshot Audio libraries
 if(NOT TARGET OpenShot::Audio)
   # Only load if necessary (not for integrated builds)
-  find_package(OpenShotAudio 0.3.0...0.3.3 REQUIRED)
+  #find_package(OpenShotAudio 0.3.0...0.3.3 REQUIRED)
+  find_package(OpenShotAudio 0.3.0...0.3.3 HINTS ${LIBOPENSHOT_AUDIO_DIR} REQUIRED)
 endif()
 target_link_libraries(openshot PUBLIC OpenShot::Audio)
 
