@@ -482,7 +482,7 @@ double Timeline::GetMinTime() {
 int64_t Timeline::GetMinFrame() {
 	double fps = info.fps.ToDouble();
 	auto min_time = GetMinTime();
-	return std::round(min_time * fps);
+	return std::round(min_time * fps) + 1;
 }
 
 // Apply a FrameMapper to a clip which matches the settings of this timeline

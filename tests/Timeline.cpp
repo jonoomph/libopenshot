@@ -676,7 +676,7 @@ TEST_CASE( "GetMinFrame and GetMinTime", "[libopenshot][timeline]" )
     t.AddClip(&clip1);
 
     CHECK(t.GetMinTime() == Approx(50.0).margin(0.001));
-    CHECK(t.GetMinFrame() == 50 * 30);
+    CHECK(t.GetMinFrame() == (50 * 30) + 1);
 
     Clip clip2(path1.str());
     clip2.Id("C2");
@@ -686,24 +686,24 @@ TEST_CASE( "GetMinFrame and GetMinTime", "[libopenshot][timeline]" )
     t.AddClip(&clip2);
 
     CHECK(t.GetMinTime() == Approx(0.0).margin(0.001));
-    CHECK(t.GetMinFrame() == 0);
+    CHECK(t.GetMinFrame() == 1);
 
     clip1.Position(80); // Move clip1 to start at 80 seconds
     clip2.Position(100); // Move clip2 to start at 100 seconds
     CHECK(t.GetMinTime() == Approx(80.0).margin(0.001));
-    CHECK(t.GetMinFrame() == 80 * 30);
+    CHECK(t.GetMinFrame() == (80 * 30) + 1);
 
     clip2.Position(20); // Adjust clip2 to start at 20 seconds
     CHECK(t.GetMinTime() == Approx(20.0).margin(0.001));
-    CHECK(t.GetMinFrame() == 20 * 30);
+    CHECK(t.GetMinFrame() == (20 * 30) + 1);
 
     clip2.End(35); // Adjust clip2 to end at 35 seconds
     CHECK(t.GetMinTime() == Approx(20.0).margin(0.001));
-    CHECK(t.GetMinFrame() == 20 * 30);
+    CHECK(t.GetMinFrame() == (20 * 30) + 1);
 
     t.RemoveClip(&clip1);
     CHECK(t.GetMinTime() == Approx(20.0).margin(0.001));
-    CHECK(t.GetMinFrame() == 20 * 30);
+    CHECK(t.GetMinFrame() == (20 * 30) + 1);
 
     // Update Clip's basic properties with JSON Diff
     std::stringstream json_change1;
@@ -711,7 +711,7 @@ TEST_CASE( "GetMinFrame and GetMinTime", "[libopenshot][timeline]" )
     t.ApplyJsonDiff(json_change1.str());
 
     CHECK(t.GetMinTime() == Approx(5.0).margin(0.001));
-    CHECK(t.GetMinFrame() == 5 * 30);
+    CHECK(t.GetMinFrame() == (5 * 30) + 1);
 
     // Insert NEW Clip with JSON Diff
     std::stringstream json_change2;
@@ -719,7 +719,7 @@ TEST_CASE( "GetMinFrame and GetMinTime", "[libopenshot][timeline]" )
     t.ApplyJsonDiff(json_change2.str());
 
     CHECK(t.GetMinTime() == Approx(5.0).margin(0.001));
-    CHECK(t.GetMinFrame() == 5 * 30);
+    CHECK(t.GetMinFrame() == (5 * 30) + 1);
 }
 
 TEST_CASE( "Multi-threaded Timeline GetFrame", "[libopenshot][timeline]" )

@@ -411,7 +411,8 @@ void ObjectDetection::SetJsonValue(const Json::Value root) {
         QString qClassFilter = QString::fromStdString(root["class_filter"].asString());
 
         // Split the QString by commas and automatically trim each resulting string
-        QStringList classList = qClassFilter.split(',', QString::SkipEmptyParts);
+        QStringList classList = qClassFilter.split(',');
+    	classList.removeAll(""); // Skip empty parts
         display_classes.clear();
 
         // Iterate over the QStringList and add each trimmed, non-empty string
