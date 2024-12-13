@@ -25,6 +25,8 @@
 #include <thread>	// for std::this_thread::sleep_for
 #include <chrono>	// for std::chrono::milliseconds
 #include <sstream>
+#include <condition_variable>
+#include <mutex>
 
 using namespace juce;
 
@@ -57,9 +59,9 @@ namespace openshot
 
 			std::stringstream constructor_title;
 			constructor_title << "AudioDeviceManagerSingleton::Instance (default audio device type: " <<
-			Settings::Instance()->PLAYBACK_AUDIO_DEVICE_TYPE << ", default audio device name: " <<
-			Settings::Instance()->PLAYBACK_AUDIO_DEVICE_NAME << ")";
-			ZmqLogger::Instance()->AppendDebugMethod(constructor_title.str(), "channels", channels);
+				Settings::Instance()->PLAYBACK_AUDIO_DEVICE_TYPE << ", default audio device name: " <<
+				Settings::Instance()->PLAYBACK_AUDIO_DEVICE_NAME << ")";
+			ZmqLogger::Instance()->AppendDebugMethod(constructor_title.str(), "channels", channels, "buffer", Settings::Instance()->PLAYBACK_AUDIO_BUFFER_SIZE);
 
 			// Get preferred audio device type and name (if any - these can be blank)
 			openshot::AudioDeviceInfo requested_device = {Settings::Instance()->PLAYBACK_AUDIO_DEVICE_TYPE,
@@ -81,10 +83,17 @@ namespace openshot
 			// Populate all possible device types and device names (starting with the user's requested settings)
 			std::vector<openshot::AudioDeviceInfo> devices{ { requested_device } };
 			for (const auto t : mgr->getAvailableDeviceTypes()) {
+				std::stringstream type_debug;
+				type_debug << "AudioDeviceManagerSingleton::Instance (iterate audio device type: " <<  t->getTypeName() << ")";
+				ZmqLogger::Instance()->AppendDebugMethod(type_debug.str(), "rate", rate, "channels", channels);
+
 				t->scanForDevices();
 				for (const auto n : t->getDeviceNames()) {
 					AudioDeviceInfo device = { t->getTypeName(), n.trim() };
 					devices.push_back(device);
+					std::stringstream device_debug;
+					device_debug << "AudioDeviceManagerSingleton::Instance (iterate audio device name: " <<  device.name << ", type: " <<  t->getTypeName() << ")";
+					ZmqLogger::Instance()->AppendDebugMethod(device_debug.str(), "rate", rate, "channels", channels);
 				}
 			}
 
@@ -104,6 +113,7 @@ namespace openshot
 				AudioDeviceManager::AudioDeviceSetup deviceSetup = AudioDeviceManager::AudioDeviceSetup();
 				deviceSetup.inputChannels = 0;
 				deviceSetup.outputChannels = channels;
+				deviceSetup.bufferSize = Settings::Instance()->PLAYBACK_AUDIO_BUFFER_SIZE;
 
 				// Loop through common sample rates, starting with the user's requested rate
 				// Not all sample rates are supported by audio devices, for example, many VMs
@@ -234,16 +244,21 @@ namespace openshot
 		}
 	}
 
-	// Play the audio
+	// Override Play and Stop to notify of state changes
 	void AudioPlaybackThread::Play() {
-		// Start playing
 		is_playing = true;
+		NotifyTransportStateChanged();
 	}
 
-	// Stop the audio
 	void AudioPlaybackThread::Stop() {
-		// Stop playing
 		is_playing = false;
+		NotifyTransportStateChanged();
+	}
+
+	void AudioPlaybackThread::NotifyTransportStateChanged()
+	{
+		std::lock_guard<std::mutex> lock(transportMutex);
+		transportCondition.notify_all();
 	}
 
 	// Start audio thread
@@ -260,7 +275,7 @@ namespace openshot
 				audioInstance->audioDeviceManager.addAudioCallback(&player);
 
 				// Create TimeSliceThread for audio buffering
-				time_thread.startThread();
+				time_thread.startThread(Priority::high);
 
 				// Connect source to transport
 				transport.setSource(
@@ -279,8 +294,13 @@ namespace openshot
 				// Start the transport
 				transport.start();
 
-				while (!threadShouldExit() && transport.isPlaying() && is_playing)
-					std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                    while (!threadShouldExit() && transport.isPlaying() && is_playing) {
+                        // Wait until transport state changes or thread should exit
+                        std::unique_lock<std::mutex> lock(transportMutex);
+                        transportCondition.wait_for(lock, std::chrono::milliseconds(10), [this]() {
+                            return threadShouldExit() || !transport.isPlaying() || !is_playing;
+                        });
+                    }
 
 				// Stop audio and shutdown transport
 				Stop();

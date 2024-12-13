@@ -86,11 +86,16 @@ public:
 		bool is_playing;
 		juce::TimeSliceThread time_thread;
 		openshot::VideoCacheThread *videoCache; /// The cache thread (for pre-roll checking)
+		std::mutex transportMutex;
+		std::condition_variable transportCondition;
 
 		/// Constructor
 		AudioPlaybackThread(openshot::VideoCacheThread* cache);
 		/// Destructor
 		~AudioPlaybackThread();
+
+		/// Notify all
+		void NotifyTransportStateChanged();
 
 		/// Set the current thread's reader
 		void Reader(openshot::ReaderBase *reader);
