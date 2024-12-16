@@ -97,9 +97,10 @@ std::shared_ptr<openshot::Frame> Outline::GetFrame(std::shared_ptr<openshot::Fra
 	
 	std::shared_ptr<QImage> new_frame_image = BGRACvMatToQImage(final_image);
 
+	
+	frame_image.swap(new_frame_image);
 	// FIXME: The shared_ptr::swap does not work somehow
-	// frame_image.swap(new_frame_image);
-	*frame_image = *new_frame_image;
+	// *frame_image = *new_frame_image;
 	
 	// return the modified frame
 	return frame;
