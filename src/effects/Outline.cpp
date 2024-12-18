@@ -50,12 +50,19 @@ std::shared_ptr<openshot::Frame> Outline::GetFrame(std::shared_ptr<openshot::Fra
 	// Get the frame's image
 	std::shared_ptr<QImage> frame_image = frame->GetImage();
 
-	int sigmaValue = width.GetValue(frame_number) / 3;
+	int widthValue = width.GetValue(frame_number);
 	int redValue = red.GetValue(frame_number);
 	int greenValue = green.GetValue(frame_number);
 	int blueValue = blue.GetValue(frame_number);
 	int alphaValue = alpha.GetValue(frame_number);
 	
+	if ((widthValue <= 0) || (alphaValue <= 0)) {
+		// If alpha or width is zero, return the original frame
+		return frame;
+	}
+
+	int sigmaValue = widthValue / 3;
+
 	// Get BGRA image from QImage
 	cv::Mat cv_image = QImageToBGRACvMat(frame_image);
 
