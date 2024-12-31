@@ -32,6 +32,11 @@ message(STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
 set_property(SOURCE openshot.i PROPERTY CPLUSPLUS ON)
 set_property(SOURCE openshot.i PROPERTY SWIG_MODULE_NAME openshot)
 
+### Set the swig package name for the JAR
+set_source_files_properties(openshot.i PROPERTIES
+        SWIG_FLAGS "-package;org.openshot"
+)
+
 ### Suppress a ton of warnings in the generated SWIG C++ code
 set(SWIG_CXX_FLAGS "-Wno-unused-variable -Wno-unused-function \
   -Wno-deprecated-copy -Wno-class-memaccess -Wno-cast-function-type \

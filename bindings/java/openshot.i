@@ -32,14 +32,14 @@
 %include <std_except.i>
 
 /* Include shared pointer code */
-#%include <std_shared_ptr.i>
+%include <std_shared_ptr.i>
 
 /* Mark these classes as shared_ptr classes */
 #ifdef USE_IMAGEMAGICK
-	#%shared_ptr(Magick::Image)
+	%shared_ptr(Magick::Image)
 #endif
-#%shared_ptr(juce::AudioBuffer<float>)
-#%shared_ptr(openshot::Frame)
+%shared_ptr(juce::AudioBuffer<float>)
+%shared_ptr(openshot::Frame)
 
 /* Instantiate the required template specializations */
 %template() std::map<std::string, int>;
