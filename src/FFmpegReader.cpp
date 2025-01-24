@@ -1269,7 +1269,11 @@ bool FFmpegReader::GetAVFrame() {
 			frameFinished = 1;
 			packet_status.video_decoded++;
 
-			av_image_alloc(pFrame->data, pFrame->linesize, info.width, info.height, (AVPixelFormat)(pStream->codecpar->format), 1);
+      // align 32 for simd
+			if (av_image_alloc(pFrame->data, pFrame->linesize, info.width,
+						info.height, (AVPixelFormat)(pStream->codecpar->format), 32) <= 0) {
+						throw OutOfMemory("Failed to allocate image buffer", path);
+			}
 			av_image_copy(pFrame->data, pFrame->linesize, (const uint8_t**)next_frame->data, next_frame->linesize,
 										(AVPixelFormat)(pStream->codecpar->format), info.width, info.height);
 
